@@ -1,0 +1,208 @@
+{
+  "schema": "task-relay-machine-jobs/v2",
+  "as_of": "2026-07-10T22:35:27Z",
+  "service_name": "Task Relay Bot",
+  "machine_consumption_model": "A machine sends a bounded request, Task Relay performs the bounded job, a strict result returns, and the machine programmatically consumes the result to choose an automatic next action. Human sponsors may configure or fund the machine; runtime consumption is machine-to-machine.",
+  "payment_protocol": "x402",
+  "network": "eip155:8453",
+  "discovery_without_brand_query": {
+    "1": "Query x402 Bazaar discovery search with a machine-need phrase (not merchant name)",
+    "2": "Filter candidates by request/result shape and price",
+    "3": "Optionally cross-check public manifest or this catalog by resource path",
+    "4": "POST unpaid to observe 402 payment requirements",
+    "5": "Settle x402 and retry",
+    "6": "Consume strict result and take automatic next action"
+  },
+  "franchises": [
+    {
+      "franchise_id": 1,
+      "display_name": "URL Health Pack",
+      "task_type": "url_health_pack",
+      "machine_trigger": "Machine must decide whether to continue, defer, or reject work on one public HTTP/HTTPS URL",
+      "resource": "https://task-relay-production.up.railway.app/x402/url-health",
+      "resource_path": "/x402/url-health",
+      "http_method": "POST",
+      "price_usdc": 0.002,
+      "atomic_amount": "2000",
+      "request_schema": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public HTTP or HTTPS URL"
+          }
+        },
+        "additionalProperties": false
+      },
+      "strict_result_summary": "statused reachability result: status, DNS, redirects, HTTP status, TLS facts, content fingerprint, elapsed_ms",
+      "automatic_machine_actions": [
+        "CONTINUE",
+        "DEFER",
+        "REJECT_TARGET"
+      ],
+      "metering_unit": "billable_units=1",
+      "discovery_status": "BAZAAR_X402_DISCOVERABLE",
+      "integration_examples": [
+        "https://github.com/NOT_PUBLISHED/task-relay-machine-examples/tree/main/examples/url_health_consumer"
+      ],
+      "optional_request_headers": {
+        "X-Task-Relay-Campaign": "optional lowercase [a-z0-9_-]{1,64} acquisition attribution only; does not alter price or payment"
+      }
+    },
+    {
+      "franchise_id": 2,
+      "display_name": "PDF Text Pack",
+      "task_type": "pdf_to_plain_text",
+      "machine_trigger": "Machine needs plain text from a public PDF URL for ingestion or indexing",
+      "resource": "https://task-relay-production.up.railway.app/x402/pdf-text",
+      "resource_path": "/x402/pdf-text",
+      "http_method": "POST",
+      "price_usdc": 0.01,
+      "atomic_amount": "10000",
+      "request_schema": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public PDF URL"
+          }
+        },
+        "additionalProperties": false
+      },
+      "strict_result_summary": "text-layer extraction: status, text, page counts, hashes, truncation, warnings (no OCR)",
+      "automatic_machine_actions": [
+        "INGEST_TEXT",
+        "SKIP_NO_TEXT",
+        "ABORT_FETCH_ERROR"
+      ],
+      "metering_unit": "billable_units=1",
+      "discovery_status": "BAZAAR_X402_DISCOVERABLE",
+      "integration_examples": [
+        "https://github.com/NOT_PUBLISHED/task-relay-machine-examples/tree/main/examples/pdf_text_consumer"
+      ],
+      "optional_request_headers": {
+        "X-Task-Relay-Campaign": "optional lowercase [a-z0-9_-]{1,64} acquisition attribution only; does not alter price or payment"
+      }
+    },
+    {
+      "franchise_id": 3,
+      "display_name": "CSV Structure Pack",
+      "task_type": "csv_to_json_structure",
+      "machine_trigger": "Machine must ingest a public CSV URL into structured rows for an automated load/transform step",
+      "resource": "https://task-relay-production.up.railway.app/x402/csv-structure",
+      "resource_path": "/x402/csv-structure",
+      "http_method": "POST",
+      "price_usdc": 0.002,
+      "atomic_amount": "2000",
+      "request_schema": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public UTF-8 CSV URL"
+          }
+        },
+        "additionalProperties": false
+      },
+      "strict_result_summary": "ordered row arrays with column/dialect metadata under fixed parse limits",
+      "automatic_machine_actions": [
+        "LOAD_ROWS",
+        "ABORT_INVALID_CSV",
+        "TRUNCATE_AWARE_CONTINUE"
+      ],
+      "metering_unit": "billable_units=1",
+      "discovery_status": "BAZAAR_X402_DISCOVERABLE",
+      "integration_examples": [
+        "https://github.com/NOT_PUBLISHED/task-relay-machine-examples/tree/main/examples/csv_structure_consumer"
+      ],
+      "optional_request_headers": {
+        "X-Task-Relay-Campaign": "optional lowercase [a-z0-9_-]{1,64} acquisition attribution only; does not alter price or payment"
+      }
+    },
+    {
+      "franchise_id": 4,
+      "display_name": "HTML to Markdown Pack",
+      "task_type": "html_to_markdown",
+      "machine_trigger": "Machine already holds HTML and needs deterministic Markdown for a content pipeline",
+      "resource": "https://task-relay-production.up.railway.app/x402/html-to-markdown",
+      "resource_path": "/x402/html-to-markdown",
+      "http_method": "POST",
+      "price_usdc": 0.002,
+      "atomic_amount": "2000",
+      "request_schema": {
+        "type": "object",
+        "required": [
+          "html"
+        ],
+        "properties": {
+          "html": {
+            "type": "string",
+            "description": "HTML string held by caller"
+          }
+        },
+        "additionalProperties": false
+      },
+      "strict_result_summary": "Markdown plus source hash, structural counts, output hash, truncation, warnings",
+      "automatic_machine_actions": [
+        "PIPE_MARKDOWN",
+        "ABORT_EMPTY",
+        "HANDLE_TRUNCATION"
+      ],
+      "metering_unit": "billable_units=1",
+      "discovery_status": "BAZAAR_X402_DISCOVERABLE",
+      "integration_examples": [
+        "https://github.com/NOT_PUBLISHED/task-relay-machine-examples/tree/main/examples/html_to_markdown_consumer"
+      ],
+      "optional_request_headers": {
+        "X-Task-Relay-Campaign": "optional lowercase [a-z0-9_-]{1,64} acquisition attribution only; does not alter price or payment"
+      }
+    },
+    {
+      "franchise_id": 5,
+      "display_name": "Page Screenshot Capture Pack",
+      "task_type": "page_screenshot_capture",
+      "machine_trigger": "Machine needs a fixed visual record of a public page for archive or rendered-page indexing",
+      "resource": "https://task-relay-production.up.railway.app/x402/page-screenshot",
+      "resource_path": "/x402/page-screenshot",
+      "http_method": "POST",
+      "price_usdc": 0.1,
+      "atomic_amount": "100000",
+      "request_schema": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public page URL"
+          }
+        },
+        "additionalProperties": false
+      },
+      "strict_result_summary": "one fixed-viewport JPEG plus navigation/artifact metadata (managed browser runtime)",
+      "automatic_machine_actions": [
+        "STORE_SCREENSHOT",
+        "INDEX_RENDERED_PAGE_IMAGE",
+        "ABORT_NAVIGATION_FAILED"
+      ],
+      "metering_unit": "billable_units=1",
+      "discovery_status": "BAZAAR_X402_DISCOVERABLE",
+      "integration_examples": [
+        "https://github.com/NOT_PUBLISHED/task-relay-machine-examples/tree/main/examples/page_screenshot_consumer"
+      ],
+      "optional_request_headers": {
+        "X-Task-Relay-Campaign": "optional lowercase [a-z0-9_-]{1,64} acquisition attribution only; does not alter price or payment"
+      }
+    }
+  ]
+}
